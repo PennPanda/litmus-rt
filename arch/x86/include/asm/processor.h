@@ -173,6 +173,15 @@ void print_cpu_msr(struct cpuinfo_x86 *);
 extern void init_scattered_cpuid_features(struct cpuinfo_x86 *c);
 extern unsigned int init_intel_cacheinfo(struct cpuinfo_x86 *c);
 extern void init_amd_cacheinfo(struct cpuinfo_x86 *c);
+#ifdef CONFIG_SYSFS
+/* Note: commit 04a1541828ea223169eb44a336bfad8ec0dfb46a hid num_cache_leaves,
+ * but LITMUS^RT currently still depends on it.
+ * FIXME: port LITMUS^RT's affinity-aware scheduling to use proper interfaces.
+ */
+extern unsigned short num_cache_leaves;
+extern int get_shared_cpu_map(cpumask_var_t mask,
+			       unsigned int cpu, int index);
+#endif
 
 extern void detect_extended_topology(struct cpuinfo_x86 *c);
 extern void detect_ht(struct cpuinfo_x86 *c);

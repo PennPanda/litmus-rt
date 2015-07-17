@@ -55,6 +55,9 @@ struct sched_param {
 
 #include <asm/processor.h>
 
+#include <litmus/rt_param.h>
+#include <litmus/preempt.h>
+
 struct exec_domain;
 struct futex_pi_state;
 struct robust_list_head;
@@ -1027,6 +1030,7 @@ struct sched_rt_entity {
 
 
 struct rcu_node;
+struct od_table_entry;
 
 enum perf_event_task_context {
 	perf_invalid_context = -1,
@@ -1368,6 +1372,12 @@ struct task_struct {
 	int nr_dirtied;
 	int nr_dirtied_pause;
 	unsigned long dirty_paused_when; /* start of a write-and-pause period */
+
+	/* LITMUS RT parameters and state */
+	struct rt_param rt_param;
+
+	/* references to PI semaphores, etc. */
+	struct od_table_entry *od_table;
 
 #ifdef CONFIG_LATENCYTOP
 	int latency_record_count;
@@ -2366,6 +2376,7 @@ static inline int test_tsk_thread_flag(struct task_struct *tsk, int flag)
 static inline void set_tsk_need_resched(struct task_struct *tsk)
 {
 	set_tsk_thread_flag(tsk,TIF_NEED_RESCHED);
+	sched_state_will_schedule(tsk);
 }
 
 static inline void clear_tsk_need_resched(struct task_struct *tsk)

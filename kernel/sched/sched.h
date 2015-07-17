@@ -358,6 +358,11 @@ struct rt_rq {
 #endif
 };
 
+struct litmus_rq {
+	unsigned long nr_running;
+	struct task_struct *prev;
+};
+
 #ifdef CONFIG_SMP
 
 /*
@@ -422,6 +427,7 @@ struct rq {
 
 	struct cfs_rq cfs;
 	struct rt_rq rt;
+	struct litmus_rq litmus;
 
 #ifdef CONFIG_FAIR_GROUP_SCHED
 	/* list of leaf cfs_rq on this cpu: */
@@ -1011,11 +1017,12 @@ struct sched_class {
 #endif
 };
 
-#define sched_class_highest (&stop_sched_class)
+#define sched_class_highest (&litmus_sched_class)
 #define for_each_class(class) \
    for (class = sched_class_highest; class; class = class->next)
 
 extern const struct sched_class stop_sched_class;
+extern const struct sched_class litmus_sched_class;
 extern const struct sched_class rt_sched_class;
 extern const struct sched_class fair_sched_class;
 extern const struct sched_class idle_sched_class;
